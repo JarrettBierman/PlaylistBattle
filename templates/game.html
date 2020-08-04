@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block head %} 
+
+{% endblock %}
+<!--  -->
+<!--  -->
+{% block body %} 
+<div class="content">
+    <h1>Hello Twitter World, here are all of the songs</h1>
+    <h1>{{playlist.name}}</h1>
+    <h1>{{playlist.id}}</h1>
+    {% for song in playlist.songs%}
+        <h4>{{song.name}} : {{song.play_count}} plays</h4>
+    {% endfor %}
+    <a href="/">home</a>
+</div>
+{% endblock %}

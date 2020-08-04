@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head %} 
+
+{% endblock %}
+<!--  -->
+<!--  -->
+{% block body %} 
+<div class="content">
+    <h1>Hello, pick an album to play with</h1>
+
+    <!-- <a href="/game/">{{name}}</a>
+        <br> -->
+        <form action="/" method="POST">
+            {% for pl in playlists %}
+            <input type="radio" id="{{pl.name}}" name="action" value="{{pl.id}}">
+            <label for="{{pl.name}}">{{pl.name}}</label>
+            <br>
+            {% endfor %}
+            <input type="submit" value="Submit!">
+        </form>
+</div>
+{% endblock %}
