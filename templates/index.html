@@ -11,7 +11,7 @@
 
     <!-- <a href="/game/">{{name}}</a>
         <br> -->
-        <form action="/" method="POST">
+        <form action="/game" method="POST">
             {% for pl in playlists %}
             <input type="radio" id="{{pl.name}}" name="action" value="{{pl.id}}">
             <label for="{{pl.name}}">{{pl.name}}</label>

@@ -6,13 +6,30 @@
 <!--  -->
 <!--  -->
 {% block body %} 
-<div class="content">
-    <h1>Hello Twitter World, here are all of the songs</h1>
-    <h1>{{playlist.name}}</h1>
-    <h1>{{playlist.id}}</h1>
-    {% for song in playlist.songs%}
-        <h4>{{song.name}} : {{song.play_count}} plays</h4>
-    {% endfor %}
-    <a href="/">home</a>
+<h1 id="title" style="justify-content: center;">{{playlist.name}}</h1>
+<div class="container">
+    <div id="block1">
+        <h2 id="name1">{{song1.name}}</h2>
+        <h2 id="artist1">{{song1.artist}}</h2>
+        <h2 id="album1">{{song1.album}}</h2>
+        <audio controls>
+            <source src="{{song1.sound_clip}}">
+        </audio>
+        <h2 id="plays1">{{song1.play_count}}</h2>
+    </div>
+    
+    <div id="block2">
+        <h2 id="name2">{{song2.name}}</h2>
+        <h2 id="artist2">{{song2.artist}}</h2>
+        <h2 id="album2">{{song2.album}}</h2>
+        <audio controls>
+            <source src="{{song2.sound_clip}}">
+        </audio>
+        <h2 id="plays2">{{song2.play_count}}</h2>
+    </div>
 </div>
+<form action="/game" method="POST">
+    <button id="nextButton">Next</button>
+</form>
+<p>{{message}}</p>
 {% endblock %}

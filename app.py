@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import pylast
 import random
+import json
 
 #global things
 global playlists
@@ -45,6 +46,7 @@ class Song:
     def update_play_count(self):
         self.play_count = network.get_track(self.artist, self.name).get_playcount()
         print("count updated")
+        return self
 
 class Playlist:
     def __init__(self, name, id): # playlist_object will be something like sp_id = sp.current_user_playlists()['items'][0]['id']  p_obj = sp.user_playlist_tracks(playlist_id = p_id)  
@@ -65,9 +67,8 @@ class Playlist:
 
             # randomize list of songs
             random.shuffle(self.songs)
-
-        for x in range(5):
-            self.songs[x].update_play_count()
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 def create_playlists(sp):
     lists = sp.current_user_playlists()['items']
@@ -102,24 +103,31 @@ app = Flask(__name__)
 sp = authorize_spotify()
 network = authorize_lastfm()
 playlists = create_playlists(sp)
+chosen_playlist = None
+song_counter = 0
 
 #THE ACTUAL SERVER PART
 @app.route('/', methods = ['GET', 'POST'])
-def index():
-    if(request.method == 'POST'):
+def index(): 
+    return render_template('index.html', playlists = playlists)
+
+@app.route('/game', methods = ['GET', 'POST'])
+def game():
+    # if(request.method == 'POST'):
+    #     return "hi"
+    # else:
+    global chosen_playlist    
+    if(chosen_playlist == None):
         chosen_playlist_id = request.form['action'] # action form, the name of the playlist
         chosen_playlist = playlist_to_id(playlists, chosen_playlist_id)
         chosen_playlist.populate()
-        return render_template('game.html', playlist = chosen_playlist)
-    else:    
-        return render_template('index.html', playlists = playlists)
-
-@app.route('/game/', methods = ['GET', 'POST'])
-def game():
-    if(request.method == 'POST'):
-        pass
-    else:    
-        return render_template('game.html')
+    global song_counter
+    if(song_counter < len(chosen_playlist.songs)):
+        song1 = chosen_playlist.songs[song_counter].update_play_count()
+        song2 = chosen_playlist.songs[song_counter+1].update_play_count()
+        song_counter += 1
+        print(song_counter)
+    return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, message = datetime.datetime.utcnow())
 
 if __name__ == "__main__":
     app.run()
