@@ -15,7 +15,7 @@
         <audio controls>
             <source src="{{song1.sound_clip}}">
         </audio>
-        <h2 id="plays1">{{song1.play_count}}</h2>
+        <h2 id="plays1">{{song1.play_count}} plays</h2>
     </div>
     
     <div id="block2">
@@ -25,11 +25,34 @@
         <audio controls>
             <source src="{{song2.sound_clip}}">
         </audio>
-        <h2 id="plays2">{{song2.play_count}}</h2>
+        <h2 id="plays2">??? plays</h2>
+        <button id="higher">Higher</button>
+        <button id="lower">Lower</button>
     </div>
 </div>
 <form action="/game" method="POST">
     <button id="nextButton">Next</button>
 </form>
 <p>{{message}}</p>
+<script>
+    $(function(){
+        var song1plays = parseInt("{{song1.play_count}}")
+        var song2plays = parseInt("{{song2.play_count}}")
+        console.log(song1plays + song2plays)
+        $("#higher").click(function(){
+            if(song2plays >= song1plays)
+                console.log("You are right")
+            else
+                console.log("You are wrong")
+            $("#plays2").text(song2plays)
+        });
+        $("#lower").click(function(){
+            if(song2plays <= song1plays)
+                console.log("You are right")
+            else
+                console.log("You are wrong")
+            $("#plays2").text(song2plays + " plays")
+        });
+    });
+</script>
 {% endblock %}

@@ -55,18 +55,23 @@ class Playlist:
         self.songs = []
 
     def populate(self):
-        tracks = sp.user_playlist_tracks(playlist_id = self.id)['items']
-        for song in tracks:
-            temp_name = song['track']['name']
-            temp_artist = song['track']['artists'][0]['name']
-            temp_album = song['track']['album']['name']
-            # temp_play_count = network.get_track(temp_artist, temp_name).get_playcount()
-            temp_play_count = 0
-            temp_clip = song['track']['preview_url']
-            self.songs.append(Song(temp_name, temp_artist, temp_album, temp_play_count, temp_clip))
+        results = sp.user_playlist_tracks(playlist_id = self.id)
+        tracks = results['items']
+        while results['next']:
+            for song in tracks:
+                temp_name = song['track']['name']
+                temp_artist = song['track']['artists'][0]['name']
+                temp_album = song['track']['album']['name']
+                # temp_play_count = network.get_track(temp_artist, temp_name).get_playcount()
+                temp_play_count = 0
+                temp_clip = song['track']['preview_url']
+                self.songs.append(Song(temp_name, temp_artist, temp_album, temp_play_count, temp_clip))
+            results = sp.next(results)
+            tracks.extend(results['items'])
 
-            # randomize list of songs
-            random.shuffle(self.songs)
+        # randomize list of songs
+        random.shuffle(self.songs)
+        
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
@@ -126,7 +131,7 @@ def game():
         song1 = chosen_playlist.songs[song_counter].update_play_count()
         song2 = chosen_playlist.songs[song_counter+1].update_play_count()
         song_counter += 1
-        print(song_counter)
+        print(len(chosen_playlist.songs))
     return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, message = datetime.datetime.utcnow())
 
 if __name__ == "__main__":
