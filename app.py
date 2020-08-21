@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -14,7 +14,7 @@ global playlists
 def authorize_spotify():
     client_id_in = '379b15e111a14089ae41a384d0db80a2'
     client_secret_in = 'f487fb0030f640eabf35f5ceefffe427'
-    redirect_uri_in = 'http://localhost:5000'
+    redirect_uri_in = 'https://jarrettbierman.github.io/'
     scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
     auth_manager_in = SpotifyOAuth(client_id = client_id_in, client_secret = client_secret_in, redirect_uri = redirect_uri_in, scope=scope, username='jarrettbierman')
@@ -160,4 +160,4 @@ def restart():
     return game()
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug = True)
