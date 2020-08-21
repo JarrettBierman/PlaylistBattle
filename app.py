@@ -14,7 +14,7 @@ global playlists
 def authorize_spotify():
     client_id_in = '379b15e111a14089ae41a384d0db80a2'
     client_secret_in = 'f487fb0030f640eabf35f5ceefffe427'
-    redirect_uri_in = 'http://example.com'
+    redirect_uri_in = 'http://localhost:5000'
     scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
     auth_manager_in = SpotifyOAuth(client_id = client_id_in, client_secret = client_secret_in, redirect_uri = redirect_uri_in, scope=scope, username='jarrettbierman')
@@ -55,25 +55,32 @@ class Playlist:
         self.songs = []
 
     def populate(self):
-        results = sp.user_playlist_tracks(playlist_id = self.id)
-        tracks = results['items']
-        while results['next']:
-            for song in tracks:
-                temp_name = song['track']['name']
-                temp_artist = song['track']['artists'][0]['name']
-                temp_album = song['track']['album']['name']
-                # temp_play_count = network.get_track(temp_artist, temp_name).get_playcount()
-                temp_play_count = 0
-                temp_clip = song['track']['preview_url']
-                self.songs.append(Song(temp_name, temp_artist, temp_album, temp_play_count, temp_clip))
-            results = sp.next(results)
-            tracks.extend(results['items'])
+        # results = sp.user_playlist_tracks(playlist_id = self.id)
+        # tracks = results['items']
+        tracks = get_all_playlist_tracks(playlist_id_in=self.id)
+        for song in tracks:
+            temp_name = song['track']['name']
+            temp_artist = song['track']['artists'][0]['name']
+            temp_album = song['track']['album']['name']
+            # temp_play_count = network.get_track(temp_artist, temp_name).get_playcount()
+            temp_play_count = 0
+            temp_clip = song['track']['preview_url']
+            self.songs.append(Song(temp_name, temp_artist, temp_album, temp_play_count, temp_clip))
+ 
 
         # randomize list of songs
         random.shuffle(self.songs)
         
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
+def get_all_playlist_tracks(playlist_id_in):
+    results = sp.user_playlist_tracks(playlist_id = playlist_id_in)
+    tracks = results['items']
+    while results['next']:
+        results = sp.next(results)
+        tracks.extend(results['items'])
+    return tracks
 
 def create_playlists(sp):
     lists = sp.current_user_playlists()['items']
@@ -110,10 +117,17 @@ network = authorize_lastfm()
 playlists = create_playlists(sp)
 chosen_playlist = None
 song_counter = 0
+score = -1
 
 #THE ACTUAL SERVER PART
 @app.route('/', methods = ['GET', 'POST'])
 def index(): 
+    global score
+    global song_counter
+    global chosen_playlist    
+    score = -1
+    song_counter = 0
+    chosen_playlist = None
     return render_template('index.html', playlists = playlists)
 
 @app.route('/game', methods = ['GET', 'POST'])
@@ -122,17 +136,28 @@ def game():
     #     return "hi"
     # else:
     global chosen_playlist    
+    global song_counter
+    global score
+
     if(chosen_playlist == None):
         chosen_playlist_id = request.form['action'] # action form, the name of the playlist
         chosen_playlist = playlist_to_id(playlists, chosen_playlist_id)
         chosen_playlist.populate()
-    global song_counter
     if(song_counter < len(chosen_playlist.songs)):
         song1 = chosen_playlist.songs[song_counter].update_play_count()
         song2 = chosen_playlist.songs[song_counter+1].update_play_count()
         song_counter += 1
-        print(len(chosen_playlist.songs))
-    return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, message = datetime.datetime.utcnow())
+        score += 1
+    return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, score = score)
+
+@app.route('/restart', methods = ['GET', 'POST'])
+def restart():
+    global song_counter
+    global score
+    song_counter = 0
+    score = -1
+    random.shuffle(chosen_playlist.songs)
+    return game()
 
 if __name__ == "__main__":
     app.run()

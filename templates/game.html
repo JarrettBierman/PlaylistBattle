@@ -6,12 +6,16 @@
 <!--  -->
 <!--  -->
 {% block body %} 
-<h1 id="title" style="justify-content: center;">{{playlist.name}}</h1>
+<h1 id="title">{{playlist.name}}</h1>
+<h1 id="score">Score: {{score}}</h1>
+<form action="/">
+    <button class="button" >Go Home</button>
+</form>
 <div class="container">
     <div id="block1">
-        <h2 id="name1">{{song1.name}}</h2>
-        <h2 id="artist1">{{song1.artist}}</h2>
-        <h2 id="album1">{{song1.album}}</h2>
+        <h2 id="name1" class="name">{{song1.name}}</h2>
+        <h2 id="artist1" class="artist">{{song1.artist}}</h2>
+        <h2 id="album1" class="album">{{song1.album}}</h2>
         <audio controls>
             <source src="{{song1.sound_clip}}">
         </audio>
@@ -19,39 +23,66 @@
     </div>
     
     <div id="block2">
-        <h2 id="name2">{{song2.name}}</h2>
-        <h2 id="artist2">{{song2.artist}}</h2>
-        <h2 id="album2">{{song2.album}}</h2>
+        <h2 id="name2" class="name">{{song2.name}}</h2>
+        <h2 id="artist2" class="artist">{{song2.artist}}</h2>
+        <h2 id="album2" class="album">{{song2.album}}</h2>
         <audio controls>
             <source src="{{song2.sound_clip}}">
         </audio>
         <h2 id="plays2">??? plays</h2>
-        <button id="higher">Higher</button>
-        <button id="lower">Lower</button>
+        <button class="button" id="higher">Higher</button>
+        <button class="button" id="lower">Lower</button>
+        <br>
     </div>
 </div>
+<h2 id="right_wrong_text"></h2>
 <form action="/game" method="POST">
-    <button id="nextButton">Next</button>
+    <button class="button" id="nextButton">Next</button>
 </form>
-<p>{{message}}</p>
+<form action="/restart" method="POST">
+    <button class="button" id="restartButton">Restart</button>
+</form>
+
 <script>
     $(function(){
-        var song1plays = parseInt("{{song1.play_count}}")
-        var song2plays = parseInt("{{song2.play_count}}")
-        console.log(song1plays + song2plays)
+        //helper functions
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
+
+        function doStuffAfterSelection(correct) {
+            var score = parseInt("{{score}}");
+            if(correct){
+                $("#right_wrong_text").text("CORRECT!");
+                $('#nextButton').show();
+                score++;
+                $("#score").text("Score: " + score);
+            }
+            else{
+                $("#right_wrong_text").text("WRONG! YOU LOSE!");
+                $('#restartButton').show();
+            }
+            $("#plays2").text(formatNumber(song2plays) + " plays"); //shows song2 plays
+            //hide and show buttons
+            $('#higher').prop('disabled', true)
+            $('#lower').prop('disabled', true)
+        }
+
+        //variables
+        var song1plays = parseInt("{{song1.play_count}}");
+        var song2plays = parseInt("{{song2.play_count}}");
+
+        $('#plays1').text(formatNumber(song1plays) + " plays"); //display commas on song 1
+
+        $('#nextButton').hide(); //hide next button
+        $('#restartButton').hide(); //hide next button
+
         $("#higher").click(function(){
-            if(song2plays >= song1plays)
-                console.log("You are right")
-            else
-                console.log("You are wrong")
-            $("#plays2").text(song2plays)
+            doStuffAfterSelection(song2plays >= song1plays);
         });
+ 
         $("#lower").click(function(){
-            if(song2plays <= song1plays)
-                console.log("You are right")
-            else
-                console.log("You are wrong")
-            $("#plays2").text(song2plays + " plays")
+            doStuffAfterSelection(song2plays <= song1plays);
         });
     });
 </script>

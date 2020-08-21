@@ -12,12 +12,17 @@
     <!-- <a href="/game/">{{name}}</a>
         <br> -->
         <form action="/game" method="POST">
-            {% for pl in playlists %}
-            <input type="radio" id="{{pl.name}}" name="action" value="{{pl.id}}">
-            <label for="{{pl.name}}">{{pl.name}}</label>
+            <label for="playlists">Choose One of your Spotify playlists</label>
+            <select class="select-css" name="action" id="playlists">
+                {% for pl in playlists %}
+                <option value="{{pl.id}}" id="{{pl.name}}">{{pl.name}}</option>
+                <!-- <input type="radio" id="{{pl.name}}" name="action" value="{{pl.id}}">
+                <label for="{{pl.name}}">{{pl.name}}</label>
+                <br> -->
+                {% endfor %}
+            </select>
             <br>
-            {% endfor %}
-            <input type="submit" value="Submit!">
+            <input type="submit" value="Go!" class="button">
         </form>
 </div>
 {% endblock %}
