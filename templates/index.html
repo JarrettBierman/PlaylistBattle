@@ -6,10 +6,6 @@
 <!--  -->
 <!--  -->
 {% block body %} 
-<form action="/choose" method="POST">
-    <label for="fname">Spotify Username:</label><br>
-    <input type="text" id="username" name="username">
-    <br>
-    <input type="submit" value="Submit">
-  </form> 
+<h1>PlaylistBattle</h1>
+<h2><a href="{{auth_url}}">Sign in</a></h2>
 {% endblock %}

@@ -160,7 +160,8 @@ def index():
     if not auth_manager.get_cached_token():
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        return f'<h2><a href="{auth_url}">Sign in</a></h2>'
+        return render_template("index.html", auth_url = auth_url)
+        # return f'<h2><a href="{auth_url}">Sign in</a></h2>'
     
     # Step 4. Signed in, display data
     sp = spotipy.Spotify(auth_manager=auth_manager)
@@ -171,7 +172,7 @@ def index():
 
 @app.route('/choose', methods = ['GET', 'POST'])
 def choose(): 
-    global score, song_counter, chosen_playlist, sp, username, playlists, auth_manager
+    global score, song_counter, chosen_playlist, sp, playlists, auth_manager
     global song_counter
     global chosen_playlist  
     global sp
@@ -181,7 +182,7 @@ def choose():
     chosen_playlist = None
     network = authorize_lastfm()
     playlists = create_playlists(sp)
-    return render_template('choose.html', playlists = playlists)
+    return render_template('choose.html', playlists = playlists, name = sp.me()['display_name'])
 
 @app.route('/game', methods = ['GET', 'POST'])
 def game():

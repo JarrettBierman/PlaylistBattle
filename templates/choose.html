@@ -7,8 +7,8 @@
 <!--  -->
 {% block body %} 
 <div class="content">
-    <h1>Hello, pick an album to play with</h1>
-
+    <h1>PlaylistBattle</h1>
+    <h2>Hello {{name}}</h2>
     <!-- <a href="/game/">{{name}}</a>
         <br> -->
         <form action="/game" method="POST">
@@ -24,8 +24,9 @@
             <br>
             <input type="submit" value="Go!" class="button">
         </form>
+        <br>
         <form action="/sign_out">
-            <button>Sign Out</button>
+            <button class="button">Sign Out</button>
         </form>
 </div>
 {% endblock %}

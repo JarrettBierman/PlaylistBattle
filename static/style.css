@@ -56,6 +56,13 @@ body{
     background-color: red;
 }
 
+#homeButton {
+	background-color: #FC4445;
+}
+#nextButton {
+	background-color: #FC4445;
+}
+
 /* div text */
 .name {
     font-size: 45px;
@@ -83,7 +90,7 @@ body{
 	/* color: #444; */
 	line-height: 1.3;
 	padding: .6em 1.4em .5em .8em;
-	width: 75%;
+	width: 50%;
 	max-width: 100%;
 	box-sizing: border-box;
 	border: 1px solid #aaa;

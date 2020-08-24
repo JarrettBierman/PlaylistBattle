@@ -6,6 +6,7 @@
 <!--  -->
 <!--  -->
 {% block body %} 
+<h1>PlaylistBattle</h1>
 <h1 id="title">{{playlist.name}}</h1>
 <div class="container">
     <div id="block1">
@@ -20,7 +21,7 @@
     <div id="scoreblock">
         <h1 id="score">Score: {{score}}</h1> 
         <form action="/choose">
-            <button class="button" >Go Home</button>
+            <button class="button" id="homeButton" >Go Home</button>
         </form>
         <h2 id="right_wrong_text"></h2>
         <form action="/game" method="POST">
