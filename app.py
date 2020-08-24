@@ -12,6 +12,8 @@ import webbrowser
 import uuid
 from flask_session import Session
 import os
+import pandas as pd
+from youtube_api import YouTubeDataAPI
 
 
 
@@ -46,6 +48,19 @@ def authorize_lastfm():
     return network
 
 
+#YOUTUBE API STUFF
+def authorize_youtube():
+    api_key = 'AIzaSyCDiIJ_wOXgXDIz0ZHj_FHQMpHJBH9i4bE'
+    yt = YouTubeDataAPI(api_key)
+    return yt
+    # print(yt.verify_key())
+    # search = yt.search(q='Saint Pablo Kanye West')
+    # video_id = search[0]['video_id']
+    # metadata = yt.get_video_metadata(video_id)
+    # view_count = metadata['video_view_count']
+    # print(f"Saint Pable has {view_count} views on youtube")
+
+
 
 class Song:
     def __init__(self, name, artist, album, play_count, sound_clip):
@@ -55,8 +70,12 @@ class Song:
         self.play_count = play_count
         self.sound_clip = sound_clip
 
-    def update_play_count(self):
-        self.play_count = network.get_track(self.artist, self.name).get_playcount()
+    def update_play_count(self, yt_api):
+        search_query = self.name + " " + self.artist
+        print(search_query)
+        video_id = yt_api.search(q = search_query)[0]['video_id']
+        view_count = yt_api.get_video_metadata(video_id)['video_view_count']
+        self.play_count = view_count
         print("count updated")
         return self
 
@@ -110,7 +129,8 @@ def playlist_to_id(pls, id):
     return None
 
 
-
+#YOutube API Testing
+authorize_youtube()
 
 #initializing vars
 username = None
@@ -172,7 +192,7 @@ def index():
 
 @app.route('/choose', methods = ['GET', 'POST'])
 def choose(): 
-    global score, song_counter, chosen_playlist, sp, playlists, auth_manager
+    global score, song_counter, chosen_playlist, sp, playlists, auth_manager, yt_api
     global song_counter
     global chosen_playlist  
     global sp
@@ -181,6 +201,7 @@ def choose():
     song_counter = 0
     chosen_playlist = None
     network = authorize_lastfm()
+    yt_api = authorize_youtube()
     playlists = create_playlists(sp)
     return render_template('choose.html', playlists = playlists, name = sp.me()['display_name'])
 
@@ -189,7 +210,7 @@ def game():
     # if(request.method == 'POST'):
     #     return "hi"
     # else:
-    global chosen_playlist, song_counter, score, playlists, network    
+    global chosen_playlist, song_counter, score, playlists, network, yt_api    
     global song_counter
     global score
     global playlists
@@ -199,8 +220,8 @@ def game():
         chosen_playlist = playlist_to_id(playlists, chosen_playlist_id)
         chosen_playlist.populate()
     if(song_counter < len(chosen_playlist.songs)):
-        song1 = chosen_playlist.songs[song_counter].update_play_count()
-        song2 = chosen_playlist.songs[song_counter+1].update_play_count()
+        song1 = chosen_playlist.songs[song_counter].update_play_count(yt_api)
+        song2 = chosen_playlist.songs[song_counter+1].update_play_count(yt_api)
         song_counter += 1
         score += 1
     return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, score = score)
