@@ -1,1 +1,2 @@
-# KnowYourMusic
+# PlaylistBattle
+# https://playlistbattle.herokuapp.com/
