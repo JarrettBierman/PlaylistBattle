@@ -25,6 +25,12 @@ body{
     transition: 0.3s ease;
 }
 
+#scoreblock {
+	background: whitesmoke;
+	border: 3px solid black;
+	width: 150px;
+}
+
 /* buttons */
 .button {
     border-radius: 12px;
@@ -43,11 +49,11 @@ body{
 }
 
 #higher:hover {
-    background-color: red;
+    background-color: green;
 }
 
 #lower:hover {
-    background-color: green;
+    background-color: red;
 }
 
 /* div text */

@@ -7,10 +7,6 @@
 <!--  -->
 {% block body %} 
 <h1 id="title">{{playlist.name}}</h1>
-<h1 id="score">Score: {{score}}</h1>
-<form action="/">
-    <button class="button" >Go Home</button>
-</form>
 <div class="container">
     <div id="block1">
         <h2 id="name1" class="name">{{song1.name}}</h2>
@@ -20,6 +16,19 @@
             <source src="{{song1.sound_clip}}">
         </audio>
         <h2 id="plays1">{{song1.play_count}} plays</h2>
+    </div>
+    <div id="scoreblock">
+        <h1 id="score">Score: {{score}}</h1> 
+        <form action="/choose">
+            <button class="button" >Go Home</button>
+        </form>
+        <h2 id="right_wrong_text"></h2>
+        <form action="/game" method="POST">
+            <button class="button" id="nextButton">Next</button>
+        </form>
+        <form action="/restart" method="POST">
+            <button class="button" id="restartButton">Restart</button>
+        </form>
     </div>
     
     <div id="block2">
@@ -35,13 +44,7 @@
         <br>
     </div>
 </div>
-<h2 id="right_wrong_text"></h2>
-<form action="/game" method="POST">
-    <button class="button" id="nextButton">Next</button>
-</form>
-<form action="/restart" method="POST">
-    <button class="button" id="restartButton">Restart</button>
-</form>
+
 
 <script>
     $(function(){

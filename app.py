@@ -1,24 +1,36 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 # from flask_sqlalchemy import SQLAlchemy
 import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import spotipy.util as util
 import pylast
 import random
 import json
+import sys
+import webbrowser
+import uuid
+from flask_session import Session
+import os
 
-#global things
-global playlists
+
+
 
 #Spotify API STUFF
 def authorize_spotify():
-    client_id_in = '379b15e111a14089ae41a384d0db80a2'
-    client_secret_in = 'f487fb0030f640eabf35f5ceefffe427'
-    redirect_uri_in = 'https://jarrettbierman.github.io/'
-    scope = "user-library-read playlist-read-private playlist-read-collaborative"
+    
+    auth_manager = SpotifyOAuth(scope=scope)
+    token_info = auth_manager.get_cached_token()
+    if not token_info:
+        auth_url = auth_manager.get_authorize_url()
 
-    auth_manager_in = SpotifyOAuth(client_id = client_id_in, client_secret = client_secret_in, redirect_uri = redirect_uri_in, scope=scope, username='jarrettbierman')
-    sp = spotipy.Spotify(auth_manager=auth_manager_in)
+
+
+    # token = util.prompt_for_user_token(username = 'bbierman07', scope = scope)
+    # auth_manager_in = SpotifyOAuth(client_id = client_id_in, client_secret = client_secret_in, redirect_uri = redirect_uri_in, scope=scope, username='jarrettbierman')
+    # token = auth_manager_in.get_access_token()
+    # sp = spotipy.Spotify(auth_manager=auth_manager_in)
+    sp = spotipy.Spotify(auth=token)
     return sp
 
     print("Spotify has been authorized")
@@ -98,46 +110,88 @@ def playlist_to_id(pls, id):
     return None
 
 
-#FLASK SERVER STUFF
-app = Flask(__name__)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-# db = SQLAlchemy(app)
 
-# class Score(db.Model):
-#     name = db.Column(db.String(100), nullable=False)
-#     score = db.Column(db.Integer, primary_key=True)
-#     # date_created = db.Column(db.DateTime, defalult=datetime.utcnow)
-
-#     def __repr__(self):
-#         return '<Task %r>' % self.id
-
-sp = authorize_spotify()
-network = authorize_lastfm()
-playlists = create_playlists(sp)
+#initializing vars
+username = None
+playlists = None
 chosen_playlist = None
+sp = None
+auth_manager = None
 song_counter = 0
 score = -1
+client_id_in = '379b15e111a14089ae41a384d0db80a2'
+client_secret_in = 'f487fb0030f640eabf35f5ceefffe427'
+redirect_uri_in = 'http://localhost:8080'
+scope = "user-library-read playlist-read-private playlist-read-collaborative"
+
+#CREATE SERVER
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(64)
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = './.flask_session/'
+Session(app)
+
+
+caches_folder = './.spotify_caches/'
+if not os.path.exists(caches_folder):
+    os.makedirs(caches_folder)
+
+# helper function for managing thhe cache folder
+def session_cache_path():
+    return caches_folder + session.get('uuid')
 
 #THE ACTUAL SERVER PART
-@app.route('/', methods = ['GET', 'POST'])
-def index(): 
-    global score
+@app.route('/')
+def index():
+    global sp
+    if not session.get('uuid'):
+        # Step 1. Visitor is unknown, give random ID
+        session['uuid'] = str(uuid.uuid4())
+
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-read-currently-playing playlist-modify-private',
+                                                cache_path=session_cache_path(), 
+                                                show_dialog=True)
+    if request.args.get("code"):
+        # Step 3. Being redirected from Spotify auth page
+        auth_manager.get_access_token(request.args.get("code"))
+        return redirect('/')
+    
+    if not auth_manager.get_cached_token():
+        # Step 2. Display sign in link when no token
+        auth_url = auth_manager.get_authorize_url()
+        return f'<h2><a href="{auth_url}">Sign in</a></h2>'
+    
+    # Step 4. Signed in, display data
+    sp = spotipy.Spotify(auth_manager=auth_manager)
+    return redirect('/choose')
+
+
+    
+
+@app.route('/choose', methods = ['GET', 'POST'])
+def choose(): 
+    global score, song_counter, chosen_playlist, sp, username, playlists, auth_manager
     global song_counter
-    global chosen_playlist    
+    global chosen_playlist  
+    global sp
+    global network
     score = -1
     song_counter = 0
     chosen_playlist = None
-    return render_template('index.html', playlists = playlists)
+    network = authorize_lastfm()
+    playlists = create_playlists(sp)
+    return render_template('choose.html', playlists = playlists)
 
 @app.route('/game', methods = ['GET', 'POST'])
 def game():
     # if(request.method == 'POST'):
     #     return "hi"
     # else:
-    global chosen_playlist    
+    global chosen_playlist, song_counter, score, playlists, network    
     global song_counter
     global score
+    global playlists
 
     if(chosen_playlist == None):
         chosen_playlist_id = request.form['action'] # action form, the name of the playlist
@@ -157,7 +211,18 @@ def restart():
     song_counter = 0
     score = -1
     random.shuffle(chosen_playlist.songs)
-    return game()
+    return redirect("/game")
+
+@app.route('/sign_out')
+def sign_out():
+    os.remove(session_cache_path())
+    try:
+        # Remove the CACHE file (.cache-test) so that a new user can authorize.
+        os.remove(session_cache_path())
+    except OSError as e:
+        print ("Error: %s - %s." % (e.filename, e.strerror))
+    session.clear()
+    return redirect('/')
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(debug = True, port = 8080)
