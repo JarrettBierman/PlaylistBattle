@@ -141,7 +141,7 @@ song_counter = 0
 score = -1
 client_id = '379b15e111a14089ae41a384d0db80a2'
 client_secret = 'f487fb0030f640eabf35f5ceefffe427'
-redirect_uri = 'http://localhost:8080'
+redirect_uri = 'https://playlistbattle.herokuapp.com'
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
 #CREATE SERVER
