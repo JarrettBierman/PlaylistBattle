@@ -72,7 +72,6 @@ class Song:
 
     def update_play_count(self, yt_api):
         search_query = self.name + " " + self.artist
-        print(search_query)
         video_id = yt_api.search(q = search_query)[0]['video_id']
         view_count = yt_api.get_video_metadata(video_id)['video_view_count']
         self.play_count = view_count
@@ -140,9 +139,9 @@ sp = None
 auth_manager = None
 song_counter = 0
 score = -1
-client_id_in = '379b15e111a14089ae41a384d0db80a2'
-client_secret_in = 'f487fb0030f640eabf35f5ceefffe427'
-redirect_uri_in = 'http://localhost:8080'
+client_id = '379b15e111a14089ae41a384d0db80a2'
+client_secret = 'f487fb0030f640eabf35f5ceefffe427'
+redirect_uri = 'http://localhost:8080'
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
 #CREATE SERVER
@@ -170,6 +169,9 @@ def index():
         session['uuid'] = str(uuid.uuid4())
 
     auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-read-currently-playing playlist-modify-private',
+                                                client_id = client_id,
+                                                client_secret = client_secret,
+                                                redirect_uri = redirect_uri,
                                                 cache_path=session_cache_path(), 
                                                 show_dialog=True)
     if request.args.get("code"):
