@@ -66,11 +66,16 @@ class Song:
         self.sound_clip = sound_clip
 
     def update_play_count(self, yt_api):
-        search_query = self.name + " " + self.artist
-        video_id = yt_api.search(q = search_query)[0]['video_id']
-        view_count = yt_api.get_video_metadata(video_id)['video_view_count']
+        search_query = self.artist + " " + self.name
+        videos = yt_api.search(q = search_query)
+        selected_ids = []
+        selected_ids.append(videos[0]['video_id'])
+        selected_ids.append(videos[1]['video_id'])
+        view_count = 0
+        for id in selected_ids:
+            print(type(yt_api.get_video_metadata(id)['video_view_count']))
+            view_count += int(yt_api.get_video_metadata(id)['video_view_count'])
         self.play_count = view_count
-        print("count updated")
         return self
 
 class Playlist:
