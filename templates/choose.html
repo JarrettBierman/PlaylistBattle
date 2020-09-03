@@ -9,16 +9,11 @@
 <div class="content">
     <h1>PlaylistBattle</h1>
     <h2>Hello {{name}}</h2>
-    <!-- <a href="/game/">{{name}}</a>
-        <br> -->
-        <form action="/game" method="POST">
+        <form action="/game/{{access_token}}/none/{{seed}}/0/0/0" method="POST">
             <label for="playlists">Choose One of your Spotify playlists</label>
             <select class="select-css" name="action" id="playlists">
                 {% for pl in playlists %}
                 <option value="{{pl.id}}" id="{{pl.name}}">{{pl.name}}</option>
-                <!-- <input type="radio" id="{{pl.name}}" name="action" value="{{pl.id}}">
-                <label for="{{pl.name}}">{{pl.name}}</label>
-                <br> -->
                 {% endfor %}
             </select>
             <br>
