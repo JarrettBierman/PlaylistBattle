@@ -18,7 +18,7 @@ body{
     border-radius: 25px;
     border: 2px solid darkgrey;
     background: #3FEEE6;
-    width: 500px;
+    width: 700px;
     margin: 20px;
     text-align: center;
     font-size: 1vw;
@@ -77,6 +77,11 @@ body{
 .album {
     font-size: 1vw;
     color: rgb(37, 37, 37);
+}
+
+.song_image{
+	width: 12vw;
+	height: 12vw;
 }
 /* selector form */
 
@@ -143,6 +148,6 @@ body{
 #endtag{
 	font-size: 20px;
 	position: absolute;
-	bottom: 3px;
+	bottom: 0px;
 	right: 5px;
 }

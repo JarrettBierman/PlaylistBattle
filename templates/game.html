@@ -11,33 +11,35 @@
 <div class="container">
     <div id="block1">
         <h2 id="name1" class="name">{{song1.name}}</h2>
+        <img class="song_image" src="{{song1.image}}">
         <h2 id="artist1" class="artist">{{song1.artist}}</h2>
         <h2 id="album1" class="album">{{song1.album}}</h2>
         <audio controls>
             <source src="{{song1.sound_clip}}">
-        </audio>
-        <h2 id="plays1">{{song1.play_count}} plays</h2>
-    </div>
-    <div id="scoreblock">
-        <h1 id="score">Score: {{score}}</h1> 
-        <form action="/choose/{{access_token}}">
-            <button class="button" id="homeButton" >Go Home</button>
-        </form>
-        <h2 id="right_wrong_text"></h2>
-        <form action="/game/{{access_token}}/{{pl_id}}/{{seed}}/{{song_counter + 1}}/{{score + 1}}/1" method="POST">
-            <button class="button" id="nextButton">Next</button>
-        </form>
-        <form action="/restart/{{access_token}}/{{pl_id}}" method="POST">
-            <button class="button" id="restartButton">Restart</button>
-        </form>
-    </div>
-    
-    <div id="block2">
-        <h2 id="name2" class="name">{{song2.name}}</h2>
-        <h2 id="artist2" class="artist">{{song2.artist}}</h2>
-        <h2 id="album2" class="album">{{song2.album}}</h2>
-        <audio controls>
-            <source src="{{song2.sound_clip}}">
+            </audio>
+            <h2 id="plays1">{{song1.play_count}} plays</h2>
+        </div>
+        <div id="scoreblock">
+            <h1 id="score">Score: {{score}}</h1> 
+            <form action="/choose/{{access_token}}">
+                <button class="button" id="homeButton" >Go Home</button>
+            </form>
+            <h2 id="right_wrong_text"></h2>
+            <form action="/game/{{access_token}}/{{pl_id}}/{{seed}}/{{song_counter + 1}}/{{score + 1}}/1" method="POST">
+                <button class="button" id="nextButton">Next</button>
+            </form>
+            <form action="/restart/{{access_token}}/{{pl_id}}" method="POST">
+                <button class="button" id="restartButton">Restart</button>
+            </form>
+        </div>
+        
+        <div id="block2">
+            <h2 id="name2" class="name">{{song2.name}}</h2>
+            <img class="song_image" src="{{song2.image}}">
+            <h2 id="artist2" class="artist">{{song2.artist}}</h2>
+            <h2 id="album2" class="album">{{song2.album}}</h2>
+            <audio controls>
+                <source src="{{song2.sound_clip}}">
         </audio>
         <h2 id="plays2">??? plays</h2>
         <button class="button" id="higher">Higher</button>
