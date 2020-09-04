@@ -93,8 +93,8 @@ def authorize_youtube():
 
 client_id = '379b15e111a14089ae41a384d0db80a2'
 client_secret = 'f487fb0030f640eabf35f5ceefffe427'
-redirect_uri = 'https://playlistbattle.herokuapp.com'
-# redirect_uri = 'http://localhost:5000'
+# redirect_uri = 'https://playlistbattle.herokuapp.com'
+redirect_uri = 'http://localhost:5000'
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
 #CREATE SERVER
@@ -167,9 +167,11 @@ def game(access_token, pl_id, song_counter, score, pl_made, seed):
     random.Random(seed).shuffle(chosen_playlist.songs) # shuffle playlist the same way using the generated seed
     song1 = chosen_playlist.songs[song_counter]
     song2 = chosen_playlist.songs[song_counter+1]
-    if yt_api is not None:
+    try:
         song1.update_play_count(yt_api)
         song2.update_play_count(yt_api)
+    except:
+        pass
     return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, pl_id = pl_id,
         score = score, song_counter = song_counter, access_token = access_token, seed = seed)
 
