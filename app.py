@@ -93,8 +93,8 @@ def authorize_youtube():
 
 client_id = '379b15e111a14089ae41a384d0db80a2'
 client_secret = 'f487fb0030f640eabf35f5ceefffe427'
-# redirect_uri = 'https://playlistbattle.herokuapp.com'
-redirect_uri = 'http://localhost:5000'
+redirect_uri = 'https://playlistbattle.herokuapp.com'
+# redirect_uri = 'http://localhost:5000'
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
 #CREATE SERVER
