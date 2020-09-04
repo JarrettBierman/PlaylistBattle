@@ -155,15 +155,21 @@ def choose(access_token):
 # Game Screen: Where one instance of the game is
 @app.route('/game/<access_token>/<pl_id>/<int:seed>/<int:song_counter>/<int:score>/<int:pl_made>', methods = ['GET', 'POST'])
 def game(access_token, pl_id, song_counter, score, pl_made, seed):
-    yt_api = authorize_youtube()
+    try:
+        yt_api = authorize_youtube()
+    except:
+        yt_api = None
     sp = spotipy.Spotify(auth = access_token)
     if pl_id == 'none':
         pl_id = request.form.get('action')
     chosen_playlist = create_playlist(sp, pl_id)
     chosen_playlist.populate(sp)
     random.Random(seed).shuffle(chosen_playlist.songs) # shuffle playlist the same way using the generated seed
-    song1 = chosen_playlist.songs[song_counter].update_play_count(yt_api)
-    song2 = chosen_playlist.songs[song_counter+1].update_play_count(yt_api)
+    song1 = chosen_playlist.songs[song_counter]
+    song2 = chosen_playlist.songs[song_counter+1]
+    if yt_api:
+        song1.update_play_count(yt_api)
+        song2.update_play_count(yt_api)
     return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, pl_id = pl_id,
         score = score, song_counter = song_counter, access_token = access_token, seed = seed)
 
