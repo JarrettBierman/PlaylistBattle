@@ -40,19 +40,30 @@ body{
     border: none;
     text-align: center;
     transition-duration: 0.4s;
-    font-family: 'Alata', sans-serif;
+	font-family: 'Alata', sans-serif;
+	background-color: #EDF5E1;
 
 }
 
 .button:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19)
+	box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+	background-color: #8EE4AF;
 }
 
-#higher:hover {
+#goButton:hover {
+	background-color: #05386B;
+	color: #EDF5E1;
+}
+#signOutButton:hover {
+	background-color: #05386B;
+	color: #EDF5E1;
+}
+
+#higher:active {
     background-color: green;
 }
 
-#lower:hover {
+#lower:active {
     background-color: red;
 }
 
@@ -71,24 +82,29 @@ body{
 
 /* div text */
 .name {
-    font-size: 2.5vw;
+    font-size: 2vw;
     color: black;
 }
 
 .artist {
-    font-size: 1.5vw;
+    font-size: 1.3vw;
     color: rgb(37, 37, 37);
 }
 
 .album {
-    font-size: 1vw;
+    font-size: 0.8vw;
     color: rgb(37, 37, 37);
 }
 
 .song_image{
-	width: 12vw;
-	height: 12vw;
+	width: 10vw;
+	height: 10vw;
 }
+
+.playText {
+	font-size: 1.5vw;
+}
+
 /* selector form */
 
 .select-css {
@@ -156,4 +172,8 @@ body{
 	position: relative;
 	bottom: 0;
 	width: 100%;
+}
+
+.bottomBar p {
+	font-size: 10px;
 }
