@@ -14,7 +14,7 @@ import pandas as pd
 import requests
 import subprocess
 
-debug = False
+debug = True
 
 class Song:
     def __init__(self, name, artist, album, album_id, play_count, sound_clip, image):
@@ -31,12 +31,13 @@ class Song:
         return self
 
     def get_play_count(self):      
-        r = requests.get(f"https://api.t4ils.dev/albumPlayCount?albumid={self.album_id}").json()
-        album_tracks = r['data']['discs'][0]['tracks']
-        for track in album_tracks:
-            if track['name'] == self.name:
-                print(track['name'])
-                return track['playcount']
+        r = requests.get(f"https://api.t4ils.dev/albumPlayCount?albumid={self.album_id}").json()    # gets all the metatdata from the public API
+        album_discs = r['data']['discs']    # list of album discs
+        for disc in album_discs:            # goes thru each disc
+            album_tracks = disc['tracks']   # gets list of song on a disc
+            for track in album_tracks:      # goes thru each song in the list
+                if track['name'] == self.name:
+                    return track['playcount']
         return -1
 
 class Playlist:
@@ -168,8 +169,6 @@ def game(access_token, pl_id, song_counter, score, pl_made, seed):
     chosen_playlist = create_playlist(sp, pl_id)
     chosen_playlist.populate(sp)
     random.Random(seed).shuffle(chosen_playlist.songs) # shuffle playlist the same way using the generated seed
-    print(song_counter+1)
-    print(chosen_playlist.size())
     if song_counter+1 < chosen_playlist.size():
         song1 = chosen_playlist.songs[song_counter].update_play_count()
         song2 = chosen_playlist.songs[song_counter+1].update_play_count()
