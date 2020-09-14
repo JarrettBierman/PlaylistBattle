@@ -11,30 +11,33 @@ import uuid
 from flask_session import Session
 import os
 import pandas as pd
-from youtube_api import YouTubeDataAPI
+import requests
+import subprocess
 
 debug = False
 
 class Song:
-    def __init__(self, name, artist, album, play_count, sound_clip, image):
+    def __init__(self, name, artist, album, album_id, play_count, sound_clip, image):
         self.name = name
         self.artist = artist
         self.album = album
+        self.album_id = album_id
         self.play_count = play_count
         self.sound_clip = sound_clip
         self.image = image
-
-    def update_play_count(self, yt_api):
-        search_query = self.artist + " " + self.name
-        videos = yt_api.search(q = search_query)
-        selected_ids = []
-        selected_ids.append(videos[0]['video_id'])
-        selected_ids.append(videos[1]['video_id'])
-        view_count = 0
-        for id in selected_ids:
-            view_count += int(yt_api.get_video_metadata(id)['video_view_count'])
-        self.play_count = view_count
+    
+    def update_play_count(self):
+        self.play_count = self.get_play_count()
         return self
+
+    def get_play_count(self):      
+        r = requests.get(f"https://api.t4ils.dev/albumPlayCount?albumid={self.album_id}").json()
+        album_tracks = r['data']['discs'][0]['tracks']
+        for track in album_tracks:
+            if track['name'] == self.name:
+                print(track['name'])
+                return track['playcount']
+        return -1
 
 class Playlist:
     def __init__(self, name, id):  
@@ -48,13 +51,17 @@ class Playlist:
             temp_name = song['track']['name']
             temp_artist = song['track']['artists'][0]['name']
             temp_album = song['track']['album']['name']
+            temp_album_id = song['track']['album']['id']
             temp_play_count = 0
             temp_clip = song['track']['preview_url']
             temp_image = song['track']['album']['images'][0]['url']
-            self.songs.append(Song(temp_name, temp_artist, temp_album, temp_play_count, temp_clip, temp_image))
+            self.songs.append(Song(temp_name, temp_artist, temp_album, temp_album_id, temp_play_count, temp_clip, temp_image))
         
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+    
+    def size(self):
+        return len(self.songs)
 
 def get_all_playlist_tracks(playlist_id_in, sp):
     if playlist_id_in == 'liked_songs':
@@ -87,12 +94,6 @@ def create_playlist(sp, id):
     pl = sp.playlist(id)
     return Playlist(pl['name'], pl['id'])
 
-#YOUTUBE API STUFF
-def authorize_youtube():
-    api_key = 'AIzaSyBhj5wg0cm1sETpB0sGyDN3sEWacnzZfRM'
-    yt = YouTubeDataAPI(api_key)
-    return yt
-
 client_id = '379b15e111a14089ae41a384d0db80a2'
 client_secret = 'f487fb0030f640eabf35f5ceefffe427'
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
@@ -101,6 +102,7 @@ if debug:
     redirect_uri = 'http://localhost:5000'
 else:
     redirect_uri = 'https://playlistbattle.herokuapp.com'
+
 
 #CREATE SERVER
 app = Flask(__name__)
@@ -160,23 +162,19 @@ def choose(access_token):
 # Game Screen: Where one instance of the game is
 @app.route('/game/<access_token>/<pl_id>/<int:seed>/<int:song_counter>/<int:score>/<int:pl_made>', methods = ['GET', 'POST'])
 def game(access_token, pl_id, song_counter, score, pl_made, seed):
-    try:
-        yt_api = authorize_youtube()
-    except:
-        yt_api = None
     sp = spotipy.Spotify(auth = access_token)
     if pl_id == 'none':
         pl_id = request.form.get('action')
     chosen_playlist = create_playlist(sp, pl_id)
     chosen_playlist.populate(sp)
     random.Random(seed).shuffle(chosen_playlist.songs) # shuffle playlist the same way using the generated seed
-    song1 = chosen_playlist.songs[song_counter]
-    song2 = chosen_playlist.songs[song_counter+1]
-    try:
-        song1.update_play_count(yt_api)
-        song2.update_play_count(yt_api)
-    except:
-        pass
+    print(song_counter+1)
+    print(chosen_playlist.size())
+    if song_counter+1 < chosen_playlist.size():
+        song1 = chosen_playlist.songs[song_counter].update_play_count()
+        song2 = chosen_playlist.songs[song_counter+1].update_play_count()
+    else:
+        return render_template("win.html", access_token = access_token)
     return render_template('game.html', playlist = chosen_playlist, song1 = song1, song2 = song2, pl_id = pl_id,
         score = score, song_counter = song_counter, access_token = access_token, seed = seed)
 
