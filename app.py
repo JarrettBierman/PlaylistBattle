@@ -31,7 +31,7 @@ class Song:
         return self
 
     def get_play_count(self):      
-        r = requests.get(f"https://api.t4ils.dev/albumPlayCount?albumid={self.album_id}").json()    # gets all the metatdata from the public API
+        r = requests.get(f"https://api.t4ils.dev/albumPlayCount?albumid={self.album_id}").json()   # gets all the metatdata from the public API
         album_discs = r['data']['discs']    # list of album discs
         for disc in album_discs:            # goes thru each disc
             album_tracks = disc['tracks']   # gets list of song on a disc
@@ -95,8 +95,9 @@ def create_playlist(sp, id):
     pl = sp.playlist(id)
     return Playlist(pl['name'], pl['id'])
 
-client_id = '379b15e111a14089ae41a384d0db80a2'
-client_secret = 'f487fb0030f640eabf35f5ceefffe427'
+
+client_id = os.environ.get('SPOTIFY_CLIENT_ID')
+client_secret = os.environ.get('SPOTIFY_CLIENT_SECRET')
 scope = "user-library-read playlist-read-private playlist-read-collaborative"
 
 if debug:
@@ -117,15 +118,12 @@ caches_folder = './.spotify_caches/'
 if not os.path.exists(caches_folder):
     os.makedirs(caches_folder)
 
-# helper function for managing thhe cache folder
 def session_cache_path():
     return caches_folder + session.get('uuid')
 
-#Login Page: creates auth object and gets access token
 @app.route('/')
 def index():
     if not session.get('uuid'):
-        # Step 1. Visitor is unknown, give random ID
         session['uuid'] = str(uuid.uuid4())
 
     auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private playlist-read-collaborative',
@@ -135,16 +133,13 @@ def index():
                                                 cache_path=session_cache_path(), 
                                                 show_dialog=True)
     if request.args.get("code"):
-        # Step 3. Being redirected from Spotify auth page
         auth_manager.get_access_token(request.args.get("code"))
         return redirect('/')
     
     if not auth_manager.get_cached_token():
-        # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
         return render_template("index.html", auth_url = auth_url)
     
-    # Step 4. Signed in, display data
     sp = spotipy.Spotify(auth_manager=auth_manager)
     access_token = auth_manager.get_access_token()['access_token']
     return redirect(url_for('choose', access_token = access_token))
