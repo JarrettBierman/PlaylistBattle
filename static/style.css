@@ -24,6 +24,24 @@ body{
     transition: 0.3s ease;
 }
 
+/* for mobile */
+@media (max-width: 450px){
+	.container{
+		flex-direction: column;
+		align-items: center;
+	}
+	.container div{
+		width: 90vw;
+	}
+	.name{
+		font-size: 1px;
+	}
+
+	audio{
+		display: none;
+	}
+}
+
 #scoreblock {
 	background: #8EE4AF;
 	/* border: 3px solid black; */
@@ -33,8 +51,8 @@ body{
 /* buttons */
 .button {
     border-radius: 12px;
-    font-size: 1vw;
-	padding: 0.5vw 1vw;
+    font-size: 2vh;
+	padding: 1vh 2vh;
 	margin: 10px;
     text-decoration: none;
     border: none;
@@ -81,28 +99,44 @@ body{
 }
 
 /* div text */
+#title {
+	font-size: 3vh;
+}
+
+#score {
+	font-size: 3vh;
+}
+
+#moreplays {
+	font-size: 1.5vh;
+}
+
+#right_wrong_text {
+	font-size: 2vh;
+}
+
 .name {
-    font-size: 2vw;
+    font-size: 2.5vh;
     color: black;
 }
 
 .artist {
-    font-size: 1.3vw;
+    font-size: 2vh;
     color: rgb(37, 37, 37);
 }
 
 .album {
-    font-size: 0.8vw;
+    font-size: 1.5vh;
     color: rgb(37, 37, 37);
 }
 
 .song_image{
-	width: 10vw;
-	height: 10vw;
+	width: 12vh;
+	height: 12vh;
 }
 
 .playText {
-	font-size: 1.5vw;
+	font-size: 2.5vh;
 }
 
 /* selector form */

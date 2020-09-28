@@ -16,11 +16,11 @@
         <h2 id="album1" class="album">{{song1.album}}</h2>
         <audio controls>
             <source src="{{song1.sound_clip}}">
-            </audio>
+        </audio>
             <h2 class="playText" id="plays1">{{song1.play_count}} plays</h2>
         </div>
         <div id="scoreblock">
-            <h1>Which song has more plays?</h1> 
+            <h1 id="moreplays">Which song has more plays?</h1> 
             <h1 id="score">Score: {{score}}</h1> 
             <form action="/choose/{{access_token}}">
                 <button class="button" id="homeButton" >Go Home</button>
@@ -41,7 +41,7 @@
             <h2 id="album2" class="album">{{song2.album}}</h2>
             <audio controls>
                 <source src="{{song2.sound_clip}}">
-        </audio>
+            </audio>
         <h2 class="playText" id="plays2">??? plays</h2>
         <button class="button" id="higher">Higher</button>
         <button class="button" id="lower">Lower</button>
