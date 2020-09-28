@@ -14,7 +14,7 @@ import pandas as pd
 import requests
 import subprocess
 
-debug = True
+debug = False
 
 class Song:
     def __init__(self, name, artist, album, album_id, play_count, sound_clip, image):
